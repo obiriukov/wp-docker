@@ -1,0 +1,51 @@
+version: '3.7'
+services:
+
+  wordpress:
+    build:
+      context: ./cnf
+      dockerfile: Dockerfile
+      args:
+        WWWGROUP: '${WWWGROUP}'
+    image: wordpress:${WORDPRESS_VERSION:-latest}
+    container_name: ${COMPOSE_PROJECT_NAME:-wordpress}
+    volumes:
+      - ./cnf/php/php.conf.ini:/usr/local/etc/php/conf.d/php.ini
+      - ${WORDPRESS_DATA_DIR:-./wordpress}:/var/www/html
+    environment:
+      - WORDPRESS_DB_NAME=${COMPOSE_PROJECT_NAME:-wordpress}
+      - WORDPRESS_TABLE_PREFIX=${WORDPRESS_TABLE_PREFIX:-wp_}
+      - WORDPRESS_DB_HOST=${WORDPRESS_DB_HOST:-mysql}
+      - WORDPRESS_DB_USER=${DATABASE_USER:-wordpress}
+      - WORDPRESS_DB_PASSWORD=${DATABASE_PASSWORD:-wordpress}
+    depends_on:
+      - mysql
+    restart: unless-stopped
+    networks:
+      - travellist
+    ports:
+      - 80:80
+
+  mysql:
+    image: 'mysql'
+    container_name: ${COMPOSE_PROJECT_NAME:-wordpress}_mysql
+    volumes:
+      - ./mysql:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DATABASE_PASSWORD:-wordpress}
+      - MYSQL_USER=${DATABASE_USER:-wordpress}
+      - MYSQL_PASSWORD=${DATABASE_PASSWORD:-wordpress}
+      - MYSQL_DATABASE=${COMPOSE_PROJECT_NAME:-wordpress}
+    restart: unless-stopped
+    ports:
+      - '${FORWARD_DB_PORT:-3306}:3306'
+    networks:
+      - travellist
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-p${DB_PASSWORD}" ]
+      retries: 3
+      timeout: 5s
+
+networks:
+    travellist:
+        driver: bridge
