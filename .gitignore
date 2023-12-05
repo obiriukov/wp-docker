@@ -4,6 +4,7 @@
 .Rhistory
 .RData
 .DS_Store
+.vscode
 mysql/*
 !mysql/.keep
 logs/nginx/*
