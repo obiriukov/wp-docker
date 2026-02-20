@@ -23,11 +23,12 @@ services:
     restart: unless-stopped
     networks:
       - travellist
+      - api-source_travellist
     ports:
       - 80:80
 
   mysql:
-    image: 'mysql'
+    image: mysql:8.0.33
     container_name: ${COMPOSE_PROJECT_NAME:-wordpress}_mysql
     volumes:
       - ./mysql:/var/lib/mysql
@@ -49,3 +50,5 @@ services:
 networks:
     travellist:
         driver: bridge
+    api-source_travellist:
+        external: true

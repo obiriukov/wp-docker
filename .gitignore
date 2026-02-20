@@ -12,3 +12,6 @@ logs/nginx/*
 _trash
 *.Rproj
 wordpress/*
+uni-t.ua
+*.sql
+wordpress_unit
